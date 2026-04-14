@@ -16,30 +16,26 @@ struct ContentView: View {
     var body: some View {
         webView
             .toolbar {
-                Spacer()
                 
-                Text("MacTube")
-                    .padding(.leading, 110)
-                
-                Spacer()
-                
-                Button(action: {
-                    self.webView.wkWebView.goBack()
-                }, label: {
-                    Image(systemName: "chevron.left")
-                })
-                
-                Button(action: {
-                    self.webView.wkWebView.goForward()
-                }, label: {
-                    Image(systemName: "chevron.right")
-                })
-                
-                Button(action: {
-                    self.webView.wkWebView.reload()
-                }, label: {
-                    Image(systemName: "arrow.clockwise")
-                })
+                ToolbarItemGroup(placement: .primaryAction) {
+                    Button(action: {
+                        self.webView.wkWebView.goBack()
+                    }, label: {
+                        Image(systemName: "chevron.left")
+                    })
+                    
+                    Button(action: {
+                        self.webView.wkWebView.goForward()
+                    }, label: {
+                        Image(systemName: "chevron.right")
+                    })
+                    
+                    Button(action: {
+                        self.webView.wkWebView.reload()
+                    }, label: {
+                        Image(systemName: "arrow.clockwise")
+                    })
+                }
             }
             .background(Color(colorScheme == .dark
                 ? CGColor(red: 0.097, green: 0.097, blue: 0.097, alpha: 1)
@@ -50,7 +46,18 @@ struct ContentView: View {
 
 
 struct WebView: NSViewRepresentable {
-    let wkWebView = WKWebView()
+    let wkWebView: WKWebView
+    
+    init() {
+        let config = WKWebViewConfiguration()
+        if #available(macOS 12.3, *) {
+            config.preferences.isElementFullscreenEnabled = true
+        } else {
+            config.preferences.setValue(true, forKey: "fullScreenEnabled")
+        }
+        config.preferences.setValue(true, forKey: "allowsPictureInPictureMediaPlayback")
+        wkWebView = WKWebView(frame: .zero, configuration: config)
+    }
     
     func makeNSView(context: Context) -> WKWebView {
         return wkWebView
